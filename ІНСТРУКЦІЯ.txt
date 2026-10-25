@@ -1,0 +1,24 @@
+ГОТОВІ ЗМІНЕНІ ФАЙЛИ ДЛЯ integration-1
+
+1. Завантаж оригінальний проєкт: https://github.com/olehsinkevych/integration-1 -> Code -> Download ZIP.
+2. Розпакуй оригінальний проєкт.
+3. Перенеси папки та файл docker-compose.yaml з ЦЬОГО архіву в корінь оригінального проєкту із заміною однойменних файлів. Інші оригінальні файли залиш без змін.
+4. Переконайся, що в forecast-service/data/ є ames_train.csv. Якщо його немає, завантаж Ames Housing dataset та поклади CSV туди.
+5. У корені проєкту створи .env на основі .env.example (за потреби додай FORECAST_PORT=8001).
+6. Увімкни Docker Desktop, відкрий термінал у корені проєкту та запусти:
+   docker compose up --build -d
+7. Відкрий http://localhost:8000/docs і http://localhost:8001/docs
+8. Створи POST /orders, потім PATCH /orders/{oid} з {"gr_liv_area": 2200}. Перевір, що прогноз перерахувався.
+9. Перевір відмовостійкість:
+   docker compose stop forecast-api
+   docker compose up -d orders-api
+   (Якщо Compose автоматично запустить forecast-api, після запуску знову виконай docker compose stop forecast-api.)
+   Перевір GET http://localhost:8000/health і POST /orders: predicted_price має бути null.
+   PATCH /orders/{oid} зі зміненими параметрами також має зберегтися з predicted_price=null.
+   docker compose start forecast-api
+10. Для оцінювання ML-моделі переглянь вивід:
+   docker compose logs forecast-api
+   або: docker compose build --no-cache forecast-api
+   У логах побачиш Train R2/MAE і Test R2/MAE.
+
+ВАЖЛИВО: реальні метрики залежать від CSV. Архів не містить оригінального датасету, lockfile, Dockerfile та інших незмінених файлів. Цей архів — набір файлів для заміни, а не самостійний проєкт.
